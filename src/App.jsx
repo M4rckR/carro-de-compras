@@ -1,76 +1,10 @@
-/* eslint-disable no-unused-vars */
-import { useEffect, useState } from "react";
 import { Guitar } from "./Components/Guitar";
 import { Header } from "./Components/Header";
-import { db } from "./data/db";
+import { useCart } from "./hooks/useCart";
 
 export function App() {
   
-  const initialCart = () => {
-    const localStorageCart = localStorage.getItem("cart");
-    return localStorageCart ? JSON.parse(localStorageCart) : [];
-  }
-
-  const [data, setData] = useState(db);
-  const [cart, setCart] = useState(initialCart);
-
- const MAX_ITEMS = 10;
-
-
- useEffect(() => {
-  localStorage.setItem("cart", JSON.stringify(cart));
- }, [cart]);
-
-
-  function removeFromCart(id) {
-    setCart(prevCart => prevCart.filter((guitar) => guitar.id !== id));
-  }
-
-  function increaseQuantity(id) {
-    const updatedCart = cart.map((guitar) => {
-      if (guitar.id === id  && guitar.quantity < MAX_ITEMS) {
-        return {
-          ...guitar,
-          quantity: guitar.quantity + 1,
-        }; 
-      }
-      return guitar;
-    });
-    setCart(updatedCart);
-
-  }
-
-  function addToCart(item) {
-    const itemExist = cart.findIndex((guitar) => guitar.id === item.id);
-    if (itemExist >= 0) {
-      const updatedCart = [...cart];
-      updatedCart[itemExist].quantity++;
-      setCart(updatedCart);
-      
-    } else {
-      item.quantity = 1;
-      setCart(prevCart => [...prevCart, item]);
-    }
-  }
-
-  function decreaseQuantity(id) {
-    const updatedCart = cart.map((guitar) => {
-      if (guitar.id === id && guitar.quantity > 1) {
-        return {
-          ...guitar,
-          quantity: guitar.quantity - 1,
-        };
-      }
-      return guitar;
-    });
-    setCart(updatedCart);
-  }
-
-  function vaciarCarrito() {
-    setCart([]);
-  }
-
- 
+  const {data, cart, addToCart, removeFromCart, increaseQuantity, decreaseQuantity, vaciarCarrito, carTotal, isEmpty} = useCart();
 
   return (
     <>
@@ -80,6 +14,8 @@ export function App() {
         increaseQuantity={increaseQuantity}
         decreaseQuantity={decreaseQuantity}
         vaciarCarrito={vaciarCarrito}
+        carTotal={carTotal}
+        isEmpty={isEmpty}
       />
 
       <main className="container-xl mt-5">
@@ -93,14 +29,6 @@ export function App() {
               addToCart={addToCart}
             />
         ))}
-          {/* <Guitar />
-          <Guitar />
-          <Guitar />
-          <Guitar />
-          <Guitar />
-          <Guitar />
-          <Guitar />
-          <Guitar /> */}
         </div>
       </main>
 
